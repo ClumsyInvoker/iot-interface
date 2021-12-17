@@ -1,0 +1,62 @@
+#server:
+#  port: 9000
+
+spring:
+  redis:
+    host: r-2ze3fa9fbcd4d544pd.redis.rds.aliyuncs.com
+    port: 26379
+    password: Tiangwang20190220+*-@$
+    database: 14
+  data:
+    mongodb:
+      host: 47.94.232.190
+      password: Rainbow-lanjing
+      username: lanjingdev
+      port: 27017
+      database: device
+
+  rabbitmq:
+    device:
+      userame: guest
+      password: guest
+      port: 5672
+      addresses: 39.96.190.148
+      virtualHost: jx
+    ocean:
+      username: guest
+      password: guest
+      port: 5672
+      addresses: 39.96.190.148
+      virtualHost: ocean
+    waste:
+      username: guest
+      password: guest
+      port: 5672
+      addresses: 39.96.190.148
+      virtualHost: js-waste
+
+mqtt:
+  server:
+#    url: tcp://39.105.172.64:1883
+    url: tcp://47.94.232.190:1883
+  client:
+    id: irainbow_mqtt_client_789
+    random: true
+  userName: admin
+  password: public
+
+lanyun:
+  device:
+    blackKey: black_list
+    #该rediskey用于判断是否是危废收集的设备
+    wastedevicekey: wasteCollectDevice
+  service:
+    device:
+      host: http://betadevice.tian-wang.com
+      port:
+    ocean:
+      host: https://betahy2api.tian-wang.com
+      port:
+    waste:
+      host: http://wfsjbetaapi.tian-wang.com
+      port:

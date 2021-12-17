@@ -1,0 +1,60 @@
+spring:
+  redis:
+    host: r-2zem7kerga2r2xf27p.redis.rds.aliyuncs.com
+    port: 26379
+    password: "Tiangwang20190220+*-@$"
+    database: 14
+  data:
+    mongodb:
+      host: 172.17.80.178
+      password: Rainbow-lanjing
+      username: lanjingdev
+      port: 27017
+      database: device
+  rabbitmq:
+    device:
+      addresses: 172.17.80.178
+      port: 5672
+      username: guest
+      password: guest@123
+    ocean:
+      addresses: 172.17.80.178
+      port: 5672
+      username: guest
+      password: guest@123
+      virtual-host: ocean
+    waste:
+      username: guest
+      password: guest@123
+      port: 5672
+      addresses: 39.105.28.14
+      virtualHost: js-waste
+
+mqtt:
+  server:
+    url: tcp://47.98.231.86:1883
+  client:
+    id: irainbow_mqtt_client_789
+    random: true
+  userName: iotbus_test
+  password: iotbus_test
+
+netty:
+  server:
+    enable: true
+    port: 1880
+
+lanyun:
+  device:
+    blackKey: black_list
+    wastedevicekey: wasteCollectDevice
+  service:
+    device:
+      host: http://172.17.80.176
+      port: 30010
+    ocean:
+      host: "http://hy2api.tian-wang.com"
+      port:
+    waste:
+      host: http://wfsjapi.tian-wang.com
+      port:

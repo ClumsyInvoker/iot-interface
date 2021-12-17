@@ -1,0 +1,20 @@
+spring:
+  profiles:
+    active: @profileActive@
+
+mqtt:
+  mock:
+    clientId: mock_device_000001
+    enable: false
+  attentionTopics: irb/device/data,irb/device/state,irb/device/haiyou/data,irb/device/haiyou/state,irb/device/ocean/data,irb/device/ocean/state,irb/device/waste/data,irb/device/waste/state
+  qos: "1,1,1,1,1,1,1,1"
+  threadNum: 200
+  connectionTimeout: 5
+  keepAliveInterval: 600
+
+netty:
+  server:
+    enable: true
+    port: 1880
+
+
