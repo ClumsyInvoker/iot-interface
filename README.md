@@ -1,2 +1,2 @@
-# iot-interface
+# iot-gateway
 
