@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * @email 352342845@qq.com
  * @date 2019-06-21 19:33
  */
-@RestControllerAdvice(basePackages = "com.lanyun.datasource.controller")
+@RestControllerAdvice(basePackages = "com.lanyun.iot.gateway.controller.http")
 public class CommonResponseDataAdvice implements ResponseBodyAdvice<Object> {
 
     @Override

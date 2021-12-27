@@ -9,10 +9,12 @@ import com.lanyun.iot.gateway.model.protocol.other.mock.MockDeviceWatcher;
 import com.lanyun.iot.gateway.controller.mqtt.cmd.DeviceMessage;
 import com.lanyun.iot.gateway.controller.netty.codec.json.JsonMessageDecoder;
 import com.lanyun.iot.gateway.controller.netty.codec.json.MessageDecoder;
+import com.lanyun.iot.gateway.proxy.CloudWareHouseProxy;
 import com.lanyun.iot.gateway.proxy.redis.manage.MqttMessageCache;
 import com.lanyun.iot.gateway.service.OriginalDeviceMessageService;
 import com.lanyun.iot.gateway.utils.EnumUtil;
 import com.lanyun.iot.gateway.utils.JsonUtil;
+import com.lanyun.iot.gateway.proxy.CloudWareHouseProxy;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.amqp.AmqpException;
@@ -51,6 +53,9 @@ public class DeviceMessageDispatcher {
     private MqttMessageCache mqttMessageCache;
     @Autowired
     private OriginalDeviceMessageService deviceMessageService;
+
+    @Autowired
+    private CloudWareHouseProxy cloudWareHouseProxy;
 
     public void dispatchMessage(String topic, MqttMessage message) {
         mqttMessageThreadPool.execute(() -> doDispatchMessage(topic, message));
@@ -129,9 +134,9 @@ public class DeviceMessageDispatcher {
         }
 
         try {
-            sendMqMessage(routingKey,JsonUtil.toJson(deviceMessage));
+            cloudWareHouseProxy.handleIotMessage(JsonUtil.toJson(deviceMessage));
         } catch (AmqpException e) {
-            log.error("rabbitMqTemplate发送RabbitMQ消息失败，{}",e);
+            log.error("请求CloudWareHouse处理消息失败，{}",e);
         }
     }
 
@@ -144,26 +149,6 @@ public class DeviceMessageDispatcher {
             mqttMessageCache.saveToCache(serialNo, message.getPayload());
         }
         return duplicate;
-    }
-
-    private void sendMqMessage(String routingKey,String deviceMessage){
-        log.info("[RabbitMQ]发送消息到 device 服务，queue: {}, message: {}", routingKey, deviceMessage);
-        switch (routingKey){
-            case "device-message-notify":
-                deviceMqTemplate.convertAndSend(routingKey, deviceMessage);
-                break;
-            // 这里收到海油1的设备消息，在发给海油1 device处理的同事也需要发给海油2 device进行处理
-            // 海油1设备（U040119110001，U040119110002）联网认证机制未知，所以无法通过认证修改topic
-            // 这里只能保留此topic进行数据处理，待海油1设备取消时剔除
-            case "haiyou-device-message":
-                deviceMqTemplate.convertAndSend(routingKey, deviceMessage);
-            case "ocean-device-message":
-                oceanMqTemplate.convertAndSend(routingKey, deviceMessage);
-                break;
-            case "waste-device-message":
-                wasteMqTemplate.convertAndSend(routingKey, deviceMessage);
-                break;
-        }
     }
 
 }
