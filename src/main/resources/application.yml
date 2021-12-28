@@ -15,6 +15,6 @@ mqtt:
 netty:
   server:
     enable: true
-    port: 1880
+    port: 1881
 
 

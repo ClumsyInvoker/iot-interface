@@ -2,12 +2,12 @@ package com.lanyun.iot.gateway.proxy;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name="cloud-warehouse-service")
 public interface CloudWareHouseProxy {
 
-    @PostMapping("/service/iot-message")
-    void handleIotMessage(@RequestParam("iot-message") String message);
+    @PostMapping("/devices/iot-message")
+    void handleIotMessage(@RequestBody String message);
 
 }

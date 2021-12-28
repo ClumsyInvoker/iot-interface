@@ -1,38 +1,69 @@
 spring:
+  application:
+    name: iot-interface
   redis:
-    host: r-2ze3fa9fbcd4d544pd.redis.rds.aliyuncs.com
-    port: 26379
-    password: Tiangwang20190220+*-@$
-    database: 9
+    host: localhost
+    port: 6379
+    database: 0
   data:
     mongodb:
-      host: 47.94.232.190
-      password: Rainbow-lanjing
-      username: lanjingdev
+      host: localhost
       port: 27017
       database: device
   rabbitmq:
-    host: 47.94.232.190
-    port: 5672
-    username: guest
-    password: guest
-
-
+    device:
+      addresses: localhost
+      port: 5672
+      username: admin 
+      password: admin 
+    ocean:
+      addresses: localhost
+      port: 5672
+      username: admin 
+      password: admin 
+    waste:
+      addresses: localhost
+      port: 5672
+      username: admin 
+      password: admin 
+      virtualhost: js-waste
 
 mqtt:
   server:
-    url: tcp://39.105.172.64:1883
-#    url: tcp://47.94.232.190:1883
+    url: tcp://localhost:1883
   client:
-    id: irainbow_mqtt_client_789
+    id: beida_mqtt_client_demo
     random: true
-  userName: admin
+  userName: admin1
   password: public
 
 lanyun:
   device:
     blackKey: black_list
+    wastedevicekey: wasteCollectDevice
   service:
     device:
       host: http://localhost
+      port: 8183
+    ocean:
+      host: http://localhost
       port: 8182
+    waste:
+      host: http://wfsjapi.tian-wang.com
+      port:
+
+logging:
+  level: 
+    com.lanyun.datasource: debug
+  file: iot-interface.log
+
+cloud:
+  gateway:
+    discovery:
+      locator:
+        enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8077/eureka/
