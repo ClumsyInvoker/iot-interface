@@ -128,6 +128,16 @@ public class IrbMqttClient {
         }
     }
 
+    public void subscribeTopics(int qos, String topic)
+    {
+        try
+        {
+            log.info("订阅topic：" + Arrays.toString(topic));
+            client.subscribe(topic, qos);
+        } catch (Exception e) {
+            log.error("error to subscribe topics");
+        }
+    }
     public IMqttDeliveryToken sendMessage(String topic, MqttMessage mqttMessage) {
         try {
             return client.publish(topic, mqttMessage);

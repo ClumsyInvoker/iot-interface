@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.UUID;
 
 /**
  * MQTT消息转发器
@@ -103,6 +104,9 @@ public class DeviceMessageDispatcher {
             log.error("未找到对应topic：" + topic);
             return;
         }
+
+        // 获得traceid
+        String traceid = UUID.randomUUID();
 
         try {
             cloudWareHouseProxy.handleIotMessage(JsonUtil.toJson(deviceMessage));

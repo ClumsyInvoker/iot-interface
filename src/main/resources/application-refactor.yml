@@ -14,7 +14,7 @@ spring:
 
 mqtt:
   server:
-    url: tcp://47.94.232.190:1883
+    url: tcp://36.138.102.166:1883
   client:
     id: irainbow_mqtt_client_789
     random: true
