@@ -14,7 +14,6 @@ import com.lanyun.iot.gateway.proxy.redis.manage.MqttMessageCache;
 import com.lanyun.iot.gateway.service.OriginalDeviceMessageService;
 import com.lanyun.iot.gateway.utils.EnumUtil;
 import com.lanyun.iot.gateway.utils.JsonUtil;
-import com.lanyun.iot.gateway.proxy.CloudWareHouseProxy;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.amqp.AmqpException;
@@ -66,6 +65,9 @@ public class DeviceMessageDispatcher {
         if (mockDeviceWatcher != null && mockDeviceWatcher.isMockDeviceMsg(topic, message)) {
             return;
         }
+
+        log.debug("MQTT Dispatch Testing.");
+        return;
         // 数据是JSON格式，根据数据中的命令id解析出不同的数据结构体
         DeviceMessage deviceMessage = messageDecoder.decode(message.getPayload());
         if (deviceMessage == null) {
@@ -95,42 +97,11 @@ public class DeviceMessageDispatcher {
             }
         });
 
-        DeviceMessageHandler<DeviceMessage> handler = DeviceMessageHandlerFactory.getHandler(deviceMessage);
-        if (handler == null) {
-            log.error("未找到对应的handler：" + JSON.toJSONString(deviceMessage));
-            return;
-        }
-        DeviceMessage result = handler.handle(deviceMessage);
-        if (result == null) {
-            return;
-        }
-        // 根据发送的topic来处理对应的消息
+        // 获得topic名称
         TopicEnum topicEnum = EnumUtil.getByCode(topic, TopicEnum.class);
-        String routingKey;
         if (topicEnum == null) {
             log.error("未找到对应topic：" + topic);
             return;
-        }
-
-        switch (topicEnum) {
-            case JIXIE_DATA:
-            case JIXIE_STATE:
-                routingKey = "device-message-notify";
-                break;
-            case HAIYOU_DATA:
-            case HAIYOU_STATE:
-                routingKey = "haiyou-device-message";
-                break;
-            case OCEAN_DATA:
-            case OCEAN_STATE:
-                routingKey = "ocean-device-message";
-                break;
-            case WASTE_DATA:
-            case WASTE_STATE:
-                routingKey = "waste-device-message";
-                break;
-            default:
-                return;
         }
 
         try {

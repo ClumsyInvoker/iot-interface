@@ -55,6 +55,13 @@
                 <profileActive>prod</profileActive>
             </properties>
         </profile>
+        <!-- 打包命令package -P refactor -->
+        <profile>
+            <id>refactor</id>
+            <properties>
+                <profileActive>refactor</profileActive>
+            </properties>
+        </profile>
     </profiles>
 
     <dependencies>
