@@ -21,6 +21,11 @@ mqtt:
   userName: admin
   password: public
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8077/eureka/
+
 lanyun:
   device:
     blackKey: black_list
