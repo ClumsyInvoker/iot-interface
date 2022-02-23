@@ -7,6 +7,7 @@ import com.lanyun.iot.gateway.controller.mqtt.cmd.DeviceCmdEnum;
 import com.lanyun.iot.gateway.controller.mqtt.cmd.DeviceMessage;
 import com.lanyun.iot.gateway.model.protocol.data.upgrade.DeviceBinaryMsg;
 import com.lanyun.iot.gateway.model.protocol.data.upgrade.DownFileInfoResponse;
+import com.lanyun.iot.gateway.proxy.CloudWareHouseProxy;
 import com.lanyun.iot.gateway.controller.routers.DeviceRouter;
 import com.lanyun.iot.gateway.controller.routers.DeviceVersion4Router;
 import com.lanyun.iot.gateway.utils.BinaryUtil;
@@ -35,6 +36,9 @@ public class UpgradeFileInfoHandler extends AbstractBinaryMessageHandler {
     @Autowired
     private DeviceVersion4Router version4Router;
 
+    @Autowired
+    private CloudWareHouseProxy cloudWareHouseProxy;
+
     @Override
     @PostConstruct
     public void init() {
@@ -55,6 +59,7 @@ public class UpgradeFileInfoHandler extends AbstractBinaryMessageHandler {
     public DeviceBinaryMsg process(DeviceBinaryMsg input) {
         log.info("收到升级文件请求: " + BinaryUtil.toHexString(input.getAllData()));
         // 设备升级 - 通用蕴藏改款请求海油2平台
+        /*
         String url = "";
         if (input.getSerialNo().startsWith("U11010000")){
             url = version4Router.getDeviceUpgradeInfo();
@@ -62,6 +67,8 @@ public class UpgradeFileInfoHandler extends AbstractBinaryMessageHandler {
             url = deviceRouter.getDeviceUpgradeInfo();
         }
         DeviceUpgradeVersionDto version = HttpUtil.get(String.format(url, input.getSerialNo()), DeviceUpgradeVersionDto.class);
+        */
+        DeviceUpgradeVersionDto version = cloudWareHouseProxy.getDeviceUpgradeInfo(input.getSerialNo());
         if (version == null) {
             log.error("获取升级信息失败");
             return null;
