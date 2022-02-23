@@ -106,7 +106,7 @@ public class DeviceMessageDispatcher {
         }
 
         // 获得traceid
-        String traceid = UUID.randomUUID();
+        UUID traceid = UUID.randomUUID();
 
         try {
             cloudWareHouseProxy.handleIotMessage(JsonUtil.toJson(deviceMessage));
