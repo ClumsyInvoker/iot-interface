@@ -132,7 +132,7 @@ public class IrbMqttClient {
     {
         try
         {
-            log.info("订阅topic：" + Arrays.toString(topic));
+            log.info("订阅topic：" + topic);
             client.subscribe(topic, qos);
         } catch (Exception e) {
             log.error("error to subscribe topics");
