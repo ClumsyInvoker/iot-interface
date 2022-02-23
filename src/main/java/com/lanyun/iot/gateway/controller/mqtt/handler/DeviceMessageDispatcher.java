@@ -67,7 +67,7 @@ public class DeviceMessageDispatcher {
         }
 
         log.debug("MQTT Dispatch Testing.");
-        return;
+        
         // 数据是JSON格式，根据数据中的命令id解析出不同的数据结构体
         DeviceMessage deviceMessage = messageDecoder.decode(message.getPayload());
         if (deviceMessage == null) {
