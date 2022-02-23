@@ -24,7 +24,14 @@ mqtt:
 lanyun:
   device:
     blackKey: black_list
+    wastedevicekey: wasteCollectDevice
   service:
     device:
-      host: http://devdevice.tian-wang.com
+      host: http://172.17.80.176
+      port: 30010
+    ocean:
+      host: "http://hy2api.tian-wang.com"
+      port:
+    waste:
+      host: http://wfsjapi.tian-wang.com
       port:
