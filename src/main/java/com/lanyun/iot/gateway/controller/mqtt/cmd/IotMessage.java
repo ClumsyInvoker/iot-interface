@@ -1,31 +1,45 @@
 package com.lanyun.iot.gateway.controller.mqtt.cmd;
 
-import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
-
-import com.alibaba.fastjson.JSON;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+/**
+ * 设备消息新实体类
+ */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class IotMessage implements Serializable {
-    
-    private Long id;
-    private Long ts;
-    private Long deviceId;
-    private String method;
-    private String topic;
-    private String data;
+@ToString(callSuper = true)
+public class IotMessage implements IDeviceMessage {
 
-    public static IotMessage decode(@NotNull String payload) {
-        return JSON.parseObject(payload, IotMessage.class);
-    }
+    /**
+     * 消息序列号
+     */
+    @JSONField(ordinal = 0)
+    private Long id;
+    /**
+     * 时间戳
+     */
+    @JSONField(ordinal = 1)
+    private Long ts;
+    /**
+     * 设备号
+     */
+    @JSONField(ordinal = 2)
+    private Long deviceId;
+    /**
+     * 消息方法
+     */
+    @JSONField(ordinal = 3)
+    private String method;
+    /**
+     * 数据字典
+     */
+    @JSONField(ordinal = 4)
+    private String data;
+    /**
+     * 消息主题
+     */
+    @JSONField(ordinal = 5)
+    private String topic;
 
 }

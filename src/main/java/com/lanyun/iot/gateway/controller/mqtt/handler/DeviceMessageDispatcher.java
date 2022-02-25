@@ -7,7 +7,9 @@ import com.lanyun.iot.gateway.service.handler.DeviceMessageHandler;
 import com.lanyun.iot.gateway.service.handler.DeviceMessageHandlerFactory;
 import com.lanyun.iot.gateway.model.protocol.other.mock.MockDeviceWatcher;
 import com.lanyun.iot.gateway.controller.mqtt.cmd.DeviceMessage;
+import com.lanyun.iot.gateway.controller.mqtt.cmd.IotMessage;
 import com.lanyun.iot.gateway.controller.netty.codec.json.JsonMessageDecoder;
+import com.lanyun.iot.gateway.controller.netty.codec.json.NewJsonMessageDecoder;
 import com.lanyun.iot.gateway.controller.netty.codec.json.MessageDecoder;
 import com.lanyun.iot.gateway.proxy.CloudWareHouseProxy;
 import com.lanyun.iot.gateway.proxy.redis.manage.MqttMessageCache;
@@ -34,7 +36,7 @@ import java.util.UUID;
 @Component
 public class DeviceMessageDispatcher {
 
-    private MessageDecoder<DeviceMessage> messageDecoder = new JsonMessageDecoder();
+    private MessageDecoder<IotMessage> messageDecoder = new NewJsonMessageDecoder();
 
     @Autowired
     private AmqpTemplate deviceMqTemplate;
@@ -70,18 +72,19 @@ public class DeviceMessageDispatcher {
         log.debug("MQTT Dispatch Testing.");
 
         // 数据是JSON格式，根据数据中的命令id解析出不同的数据结构体
-        DeviceMessage deviceMessage = messageDecoder.decode(message.getPayload());
-        if (deviceMessage == null) {
+        IotMessage iotMessage = messageDecoder.decode(message.getPayload());
+        if (iotMessage == null) {
             return;
         }
 
         //check duplicate
-        if (isDuplicateMessage(deviceMessage.getMachNo(), message)) {
-            log.error("收到重复的 MQTT 消息: " + JsonUtil.toJson(deviceMessage));
+        if (isDuplicateMessage(iotMessage.getDeviceId(), message)) {
+            log.error("收到重复的 MQTT 消息: " + JsonUtil.toJson(iotMessage));
            return;
         }
 
         // 保存原始数据到mongo数据库的original_device_message表
+        /*
         executorService.execute(() -> {
             OriginalDeviceMessage insert = new OriginalDeviceMessage();
             insert.setVersion(deviceMessage.getVersion());
@@ -97,6 +100,7 @@ public class DeviceMessageDispatcher {
                 log.error("数据插入 MongoDB 失败:" + JsonUtil.toJson(deviceMessage), e);
             }
         });
+        */
 
         // 获得topic名称
         TopicEnum topicEnum = EnumUtil.getByCode(topic, TopicEnum.class);
@@ -104,12 +108,10 @@ public class DeviceMessageDispatcher {
             log.error("未找到对应topic：" + topic);
             return;
         }
-
-        // 获得traceid
-        UUID traceid = UUID.randomUUID();
+        iotMessage.setTopic(topic);
 
         try {
-            cloudWareHouseProxy.handleIotMessage(JsonUtil.toJson(deviceMessage));
+            cloudWareHouseProxy.handleIotMessage(JsonUtil.toJson(iotMessage));
         } catch (AmqpException e) {
             log.error("请求CloudWareHouse处理消息失败，{}",e);
         }
