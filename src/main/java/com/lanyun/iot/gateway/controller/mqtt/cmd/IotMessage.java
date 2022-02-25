@@ -25,7 +25,7 @@ public class IotMessage implements IDeviceMessage {
      * 设备号
      */
     @JSONField(ordinal = 2)
-    private Long deviceId;
+    private String deviceId;
     /**
      * 消息方法
      */
