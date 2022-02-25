@@ -110,6 +110,7 @@ public class DeviceMessageDispatcher {
         }
         iotMessage.setTopic(topic);
 
+        log.warn("尝试发送Json串：{}",JsonUtil.toJson(iotMessage));
         try {
             cloudWareHouseProxy.handleIotMessage(JsonUtil.toJson(iotMessage));
         } catch (AmqpException e) {
