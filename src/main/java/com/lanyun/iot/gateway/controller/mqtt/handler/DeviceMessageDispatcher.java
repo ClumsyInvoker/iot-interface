@@ -78,7 +78,7 @@ public class DeviceMessageDispatcher {
         }
 
         //check duplicate
-        if (isDuplicateMessage(iotMessage.getDeviceId(), message)) {
+        if (isDuplicateMessage(iotMessage.getSerialNo(), message)) {
             log.error("收到重复的 MQTT 消息: " + JsonUtil.toJson(iotMessage));
            return;
         }

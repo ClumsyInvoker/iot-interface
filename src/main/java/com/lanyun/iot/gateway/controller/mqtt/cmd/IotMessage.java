@@ -1,5 +1,6 @@
 package com.lanyun.iot.gateway.controller.mqtt.cmd;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.ToString;
@@ -25,21 +26,26 @@ public class IotMessage implements IDeviceMessage {
      * 设备号
      */
     @JSONField(ordinal = 2)
-    private String deviceId;
+    private String serialNo;
+    /*
+       产品号
+    */
+    @JSONField(ordinal = 3)
+    private Long productId;
     /**
      * 消息方法
      */
-    @JSONField(ordinal = 3)
+    @JSONField(ordinal = 4)
     private String method;
     /**
      * 数据字典
      */
-    @JSONField(ordinal = 4)
-    private String data;
+    @JSONField(ordinal = 5)
+    private JSONObject data;
     /**
      * 消息主题
      */
-    @JSONField(ordinal = 5)
+    @JSONField(ordinal = 6)
     private String topic;
 
 }
