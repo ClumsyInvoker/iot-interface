@@ -164,4 +164,8 @@ public class IrbMqttClient {
     public boolean isConnected() {
         return client != null && client.isConnected();
     }
+
+    public String[] getTopicArray(){
+        return config.getTopicArray();
+    }
 }

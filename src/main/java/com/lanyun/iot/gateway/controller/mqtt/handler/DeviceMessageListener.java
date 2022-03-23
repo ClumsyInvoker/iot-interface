@@ -45,7 +45,19 @@ public class DeviceMessageListener implements MqttCallbackExtended {
             log.debug("收到 Topic 为："+topic+"的 mqtt 消息，ID = "+message.getId()+", Qos is " + message.getQos());
         }
         // 把设备上报的消息分发给指定的处理器
-        dispatcher.dispatchMessage(topic, message);
+        String[] TopicArray = client.getTopicArray();
+        boolean isold = false;
+        for (String t : TopicArray){
+            if(t.equals(topic)){
+                isold = true;
+            }
+        }
+        if (isold){
+            dispatcher.dispatchMessage_old(topic, message);
+        }
+        else {
+            dispatcher.dispatchMessage(topic, message);
+        }
     }
 
     @Override

@@ -38,6 +38,8 @@ public class DeviceMessageDispatcher {
 
     private MessageDecoder<IotMessage> messageDecoder = new NewJsonMessageDecoder();
 
+    private MessageDecoder<DeviceMessage> messageDecoder_old = new JsonMessageDecoder();
+
     @Autowired
     private AmqpTemplate deviceMqTemplate;
     @Autowired
@@ -61,6 +63,10 @@ public class DeviceMessageDispatcher {
 
     public void dispatchMessage(String topic, MqttMessage message) {
         mqttMessageThreadPool.execute(() -> doDispatchMessage(topic, message));
+    }
+
+    public void dispatchMessage_old(String topic, MqttMessage message) {
+        mqttMessageThreadPool.execute(() -> doDispatchMessage_old(topic, message));
     }
 
     private void doDispatchMessage(String topic, MqttMessage message) {
@@ -117,6 +123,86 @@ public class DeviceMessageDispatcher {
             log.error("请求CloudWareHouse处理消息失败，{}",e);
         }
     }
+
+    private void doDispatchMessage_old(String topic, MqttMessage message) {
+        // 监测消息不做处理
+        if (mockDeviceWatcher != null && mockDeviceWatcher.isMockDeviceMsg(topic, message)) {
+            return;
+        }
+        // 数据是JSON格式，根据数据中的命令id解析出不同的数据结构体
+        DeviceMessage deviceMessage = messageDecoder_old.decode(message.getPayload());
+        if (deviceMessage == null) {
+            return;
+        }
+
+        //check duplicate
+        if (isDuplicateMessage(deviceMessage.getMachNo(), message)) {
+            log.error("收到重复的 MQTT 消息: " + JsonUtil.toJson(deviceMessage));
+            return;
+        }
+
+        // 保存原始数据到mongo数据库的original_device_message表
+        executorService.execute(() -> {
+            OriginalDeviceMessage insert = new OriginalDeviceMessage();
+            insert.setVersion(deviceMessage.getVersion());
+            insert.setMsgNo(deviceMessage.getMsgNo());
+            insert.setMachNo(deviceMessage.getMachNo());
+            insert.setCmd(deviceMessage.getCmd());
+            insert.setTime(deviceMessage.getTime());
+            insert.setData(JSON.toJSONString(deviceMessage.getData()));
+            insert.setCreateTime(System.currentTimeMillis());
+            try {
+                deviceMessageService.insert(insert);
+            } catch (Exception e) {
+                log.error("数据插入 MongoDB 失败:" + JsonUtil.toJson(deviceMessage), e);
+            }
+        });
+
+        DeviceMessageHandler<DeviceMessage> handler = DeviceMessageHandlerFactory.getHandler(deviceMessage);
+        if (handler == null) {
+            log.error("未找到对应的handler：" + JSON.toJSONString(deviceMessage));
+            return;
+        }
+        DeviceMessage result = handler.handle(deviceMessage);
+        if (result == null) {
+            return;
+        }
+        // 根据发送的topic来处理对应的消息
+        TopicEnum topicEnum = EnumUtil.getByCode(topic, TopicEnum.class);
+        String routingKey;
+        if (topicEnum == null) {
+            log.error("未找到对应topic：" + topic);
+            return;
+        }
+
+        switch (topicEnum) {
+            case JIXIE_DATA:
+            case JIXIE_STATE:
+                routingKey = "device-message-notify";
+                break;
+            case HAIYOU_DATA:
+            case HAIYOU_STATE:
+                routingKey = "haiyou-device-message";
+                break;
+            case OCEAN_DATA:
+            case OCEAN_STATE:
+                routingKey = "ocean-device-message";
+                break;
+            case WASTE_DATA:
+            case WASTE_STATE:
+                routingKey = "waste-device-message";
+                break;
+            default:
+                return;
+        }
+
+        try {
+            cloudWareHouseProxy.handleIotMessage(JsonUtil.toJson(deviceMessage));
+        } catch (AmqpException e) {
+            log.error("请求CloudWareHouse处理消息失败，{}",e);
+        }
+    }
+
 
     private boolean isDuplicateMessage(String serialNo, MqttMessage message) {
         //同一台设备的前一条消息。redis中1个设备1个key
